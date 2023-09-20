@@ -14,6 +14,7 @@ import Foundation
 struct MemoryGame<CardContent> where CardContent: Equatable {
     // private(set) allows other parts of the code to observe cards, but not to set it
     private(set) var cards: Array<Card>
+    var score = 0
     
     init(numberOfPairsOfCards: Int, createCardContent: (Int) -> CardContent) {
         cards = Array<Card>()
@@ -36,14 +37,19 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
         if let chosenIndex = cards.firstIndex(where: { $0.id == card.id }) {
             if !cards[chosenIndex].isFaceUp && !cards[chosenIndex].isMatched {
                 if let potentialMatchIndex = indexOfOnlyFaceUpCard {
+                    cards[chosenIndex].hasBeenFlipped += 1
+                    cards[potentialMatchIndex].hasBeenFlipped += 1
                     if cards[chosenIndex].content == cards[potentialMatchIndex].content {
                         cards[chosenIndex].isMatched = true
                         cards[potentialMatchIndex].isMatched = true
+                        score += 2
+                    } else if  cards[chosenIndex].hasBeenFlipped > 1 || cards[potentialMatchIndex].hasBeenFlipped > 1 {
+                        score -= 1
                     }
+                    self.cards[chosenIndex].isFaceUp = true
                 } else {
                     indexOfOnlyFaceUpCard = chosenIndex
                 }
-                cards[chosenIndex].isFaceUp = true
             }
         }
     }
@@ -66,6 +72,7 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
         var isFaceUp = false
         var isMatched = false
         let content: CardContent
+        var hasBeenFlipped: Int = 0
         
         var id: String
         var debugDescription: String {

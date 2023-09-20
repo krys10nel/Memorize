@@ -32,8 +32,11 @@ struct EmojiMemoryGameView: View {
                     Text("New Game")
                         .font(.title)
                 }
+                Spacer()
             }
             .navigationBarTitle(viewModel.theme.name)
+            .navigationBarItems(trailing: Text("Score: \(viewModel.score)"))
+            .navigationViewStyle(StackNavigationViewStyle())
             .padding()
         }
     }

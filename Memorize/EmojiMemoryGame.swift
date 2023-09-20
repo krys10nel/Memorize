@@ -31,7 +31,7 @@ class EmojiMemoryGame : ObservableObject {
     
     // it becomes ViewModel's responsibility to provide cards (and intents) to View since it now controls View's access to Model
     var cards: Array<MemoryGame<String>.Card> { model.cards }
-    
+    var score: Int { model.score }
     var theme = themes.randomElement()!
     
     init() {

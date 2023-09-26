@@ -34,20 +34,25 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
     }
     
     mutating func choose(_ card: Card) {
+        let scoreMultiplier = Int(max(10 - (card.faceUpTime), 1))
         if let chosenIndex = cards.firstIndex(where: { $0.id == card.id }) {
+            // if not FaceUp or Matched
             if !cards[chosenIndex].isFaceUp && !cards[chosenIndex].isMatched {
                 if let potentialMatchIndex = indexOfOnlyFaceUpCard {
+                    // when two cards are flipped mark both cards as flipped
                     cards[chosenIndex].hasBeenFlipped += 1
                     cards[potentialMatchIndex].hasBeenFlipped += 1
+                    // if both cards match, mark both cards as matched else decrease score when a third card is flipped (first two cards not matched)
                     if cards[chosenIndex].content == cards[potentialMatchIndex].content {
                         cards[chosenIndex].isMatched = true
                         cards[potentialMatchIndex].isMatched = true
-                        score += 2
+                        score += 2 * scoreMultiplier
                     } else if  cards[chosenIndex].hasBeenFlipped > 1 || cards[potentialMatchIndex].hasBeenFlipped > 1 {
                         score -= 1
                     }
                     self.cards[chosenIndex].isFaceUp = true
                 } else {
+                    // case when only one card is flipped (after matching or when starting a new game)
                     indexOfOnlyFaceUpCard = chosenIndex
                 }
             }
@@ -69,14 +74,49 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
     }
     
     struct Card: Equatable, Identifiable, CustomDebugStringConvertible {
-        var isFaceUp = false
+        var isFaceUp = false {
+            didSet {
+                if isFaceUp {
+                    startUsingBonusTime()
+                } else {
+                    stopUsingBonusTime()
+                }
+            }
+        }
         var isMatched = false
         let content: CardContent
         var hasBeenFlipped: Int = 0
         
+        var lastFaceUpDate: Date?
+        var pastFaceUpTime: TimeInterval = 0
+        
+        // when card is face down, records time interval from pastFaceUpTime and time interval since it was flipped over face up
+        // if lastFaceUpDate is not nil, take the TimeInterval (seconds) of pastFaceUpTime and add time interval since the lastFaceUpDate
+        var faceUpTime: TimeInterval {
+            if let lastFaceUpDate = lastFaceUpDate {
+                return pastFaceUpTime + Date().timeIntervalSince(lastFaceUpDate)
+            } else {
+                return pastFaceUpTime
+            }
+        }
+        
+        // records lastFaceUpDate when card is face up
+        private mutating func startUsingBonusTime() {
+            if lastFaceUpDate == nil {
+                lastFaceUpDate = Date()
+            }
+        }
+        
+        // calls faceUpTime when card is face down
+        private mutating func stopUsingBonusTime() {
+            pastFaceUpTime = faceUpTime
+            lastFaceUpDate = nil
+        }
+        
         var id: String
         var debugDescription: String {
             "\(id): \(content) \(isFaceUp ? "up" : "down") \(isMatched ? " matched" : "")"
+            
         }
     }
 }

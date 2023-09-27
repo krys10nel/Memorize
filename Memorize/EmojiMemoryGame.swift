@@ -14,6 +14,8 @@
 import SwiftUI
 
 class EmojiMemoryGame : ObservableObject {
+    typealias Card = MemoryGame<String>.Card
+    
     private static func createMemoryGame(theme: Theme) -> MemoryGame<String> {
         let emojis: Array<String> = theme.emojis.shuffled()
         return MemoryGame<String>(numberOfPairsOfCards: theme.noOfPairs ?? Int.random(in: 4...6)) { pairIndex in
@@ -30,7 +32,7 @@ class EmojiMemoryGame : ObservableObject {
     @Published private var model: MemoryGame<String>
     
     // it becomes ViewModel's responsibility to provide cards (and intents) to View since it now controls View's access to Model
-    var cards: Array<MemoryGame<String>.Card> { model.cards }
+    var cards: Array<Card> { model.cards }
     var score: Int { model.score }
     var theme = themes.randomElement()!
     
@@ -44,7 +46,7 @@ class EmojiMemoryGame : ObservableObject {
         model.shuffle()
     }
     
-    func choose(_ card: MemoryGame<String>.Card) {
+    func choose(_ card: Card) {
         model.choose(card)
     }
     

@@ -52,34 +52,6 @@ struct EmojiMemoryGameView: View {
     }
 }
 
-struct CardView: View {
-    let card: MemoryGame<String>.Card
-    let gradient: Gradient
-    
-    init(_ card: MemoryGame<String>.Card, _ theme: Theme) {
-        self.card = card
-        self.gradient = Gradient(colors: [theme.color, theme.accentColor])
-    }
-    
-    var body: some View {
-        ZStack {
-            let shape = RoundedRectangle(cornerRadius: 12)
-            Group {
-                shape.fill().foregroundColor(.white)
-                shape.strokeBorder(lineWidth: 3).foregroundColor(.gray)
-                Text(card.content)
-                    .font(.system(size: 200))
-                    .minimumScaleFactor(0.01)
-                    .aspectRatio(1, contentMode: .fit)
-            }
-                .opacity(card.isFaceUp ? 1 : 0)
-            shape.fill(LinearGradient(gradient: gradient, startPoint: .topLeading, endPoint: .bottomTrailing))
-                .opacity(card.isFaceUp ? 0 : 1)
-        }
-        .opacity(card.isFaceUp || !card.isMatched ? 1 : 0)
-    }
-}
-
 //------------------------------------------------------------------------------//
 
 struct EmojiMemoryGameView_Previews: PreviewProvider {

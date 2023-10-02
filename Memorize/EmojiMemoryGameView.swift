@@ -25,6 +25,7 @@ struct EmojiMemoryGameView: View {
         NavigationView {
             VStack {
                 cards
+                    .foregroundColor(viewModel.theme.color)
                     .animation(.default, value: viewModel.cards)
                 Button {
                     self.viewModel.newGame()
